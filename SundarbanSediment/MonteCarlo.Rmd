@@ -1,0 +1,581 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(ggpubr)
+library(cowplot)
+require(ggExtra)
+```
+
+```{r}
+rinormA <- read.csv("~/OnResearch/SundarbanSediment/data/MonteDataER.csv")
+rilogA <- read.csv("~/OnResearch/SundarbanSediment/data/MonteLogER.csv")
+```
+
+```{r}
+rinormA
+```
+
+```{r}
+phist <- gghistogram(
+  rilogA, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100,
+  fill = "#00AFBB", # Set histogram fill color
+  color = "black" # Set border color
+) +
+  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)") +
+  ylab("Frequency") 
+
+# 2. Create the density plot with y-axis on the right
+pdensity <- ggdensity(
+  rilogA, x = "RI",
+  fill = "cyan", # Set density fill color
+  color = "orange",  # Set density line color
+  alpha = 0.2 # Set transparency level
+) +
+  xlim(NA, 100) +
+  ylab("Density") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right") +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis") +
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+# 3. Align the two plots and then overlay them
+aligned_plots <- align_plots(phist, pdensity, align = "hv", axis = "tblr")
+p <- ggdraw(aligned_plots[[1]]) + 
+     draw_plot(aligned_plots[[2]]) + 
+     draw_label("Log Normal Distribution", 
+                fontface = "bold", size = 12, x = 0.75, y = .97, vjust = 1)
+p
+
+```
+
+
+```{r}
+phist <- gghistogram(
+  rinormA, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100,
+  fill = "#00AFBB", # Set histogram fill color
+  color = "black" # Set border color
+) +
+#  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)") +
+  ylab("Frequency") 
+
+# 2. Create the density plot with y-axis on the right
+pdensity <- ggdensity(
+  rinormA, x = "RI",
+  fill = "cyan", # Set density fill color
+  color = "orange",  # Set density line color
+  alpha = 0.2 # Set transparency level
+) +
+#  xlim(NA, 100) +
+  ylab("Density") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right") +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis") +
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+# 3. Align the two plots and then overlay them
+aligned_plots <- align_plots(phist, pdensity, align = "hv", axis = "tblr")
+
+p <- ggdraw(aligned_plots[[1]]) + 
+     draw_plot(aligned_plots[[2]]) + 
+     draw_label("Normal Distribution", 
+                fontface = "bold", size = 12, x = 0.75, y = .97, vjust = 1)
+p
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+log_normalRI <- read.csv("~/OnResearch/SundarbanSediment/data/MonteNormlog.csv")
+```
+
+```{r}
+log_normalRI
+```
+
+
+```{r}
+phist <- gghistogram(
+  log_normalRI, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100,
+  fill = "Legend", palette = c("#00AFBB", "#E7B800")
+)+
+#  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)")+
+  ylab("Frequency")
+
+# 2. Create the density plot with y-axis on the right
+# Remove x axis elements
+pdensity <- ggdensity(
+  log_normalRI, x = "RI",
+  color= "Legend", palette = c("#00AFBB", "#E7B800"),
+  alpha = 0
+) +
+#  xlim(NA, 100) +
+  ylab("Density")+
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right")  +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis")+
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+
+# 3. Align the two plots and then overlay them.
+aligned_plots <- align_plots(phist, pdensity, align="hv", axis="tblr")
+p <- ggdraw(aligned_plots[[1]]) + draw_plot(aligned_plots[[2]])
+p
+```
+
+```{r}
+phist <- gghistogram(
+  log_normalRI, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100
+)+
+  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)")+
+  ylab("Frequency")
+
+# 2. Create the density plot with y-axis on the right
+# Remove x axis elements
+pdensity <- ggdensity(
+  log_normalRI, x = "RI",
+  alpha = 0
+) +
+  xlim(NA, 100) +
+  ylab("Density")+
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right")  +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis")+
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+
+# 3. Align the two plots and then overlay them.
+aligned_plots <- align_plots(phist, pdensity, align="hv", axis="tblr")
+ggdraw(aligned_plots[[1]]) + draw_plot(aligned_plots[[2]])
+```
+
+```{r}
+phist <- gghistogram(
+  log_normalRI, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100,
+  fill = "Legend", # Set histogram fill color
+  color = "black" # Set border color
+) +
+#  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)") +
+  ylab("Frequency") +
+  theme_minimal()  # Optional: Change theme for better visuals
+
+# 2. Create the density plot with y-axis on the right
+pdensity <- ggdensity(
+  log_normalRI, x = "RI",
+  fill = "Legend", # Set density fill color
+  color = "black",  # Set density line color
+  alpha = 0.5 # Set transparency level
+) +
+#  xlim(NA, 100) +
+  ylab("Density") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right") +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis") +
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+# 3. Align the two plots and then overlay them
+aligned_plots <- align_plots(phist, pdensity, align = "hv", axis = "tblr")
+ggdraw(aligned_plots[[1]]) + draw_plot(aligned_plots[[2]])
+```
+
+```{r}
+percent <- read.csv("~/OnResearch/SundarbanSediment/data/MonteSensitivity.csv")
+percent
+```
+
+```{r}
+ggplot(data=percent,
+       aes(x=Values, y=Metals, fill = "#00AFBB"))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Mn", "Cu", "Zn", "As", "Fe"))+
+  theme_half_open()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percentage", y = "", title = "Sensitivity")+
+  theme(legend.position = "none")+
+  annotate("text", x= 45, y = 6, label = round(percent$Values[2],2), size = 4)+
+  annotate("text", x= 25, y = 5, label = round(percent$Values[5],2), size = 4)+
+  annotate("text", x= 24.9, y = 4, label = round(percent$Values[4],2), size = 4)+
+  annotate("text", x= 16, y = 3, label = round(percent$Values[3],2), size = 4)+
+  annotate("text", x= 14, y = 2, label = round(percent$Values[1],2), size = 4)+
+  annotate("text", x= 7, y = 1, label = round(percent$Values[6],2), size = 4)
+  
+
+```
+
+```{r}
+  annotate("text", x= 23, y = 5.2, label = round(percrC$percent[1],2), size = 3)+
+  annotate("text", x= 23, y = 4.8, label = round(percrC$percent[6],2), size = 3)+
+  annotate("text", x= 56.5, y = 4.2, label = round(percrC$percent[2],2), size = 3)+
+  annotate("text", x= 55, y = 3.75, label = round(percrC$percent[7],2), size = 3)+
+  annotate("text", x= 13.5, y = 3.2, label = round(percrC$percent[3],2), size = 3)+
+  annotate("text", x= 13.7, y = 2.8, label = round(percrC$percent[8],2), size = 3)+
+  annotate("text", x= 20.2, y = 2.2, label = round(percrC$percent[4],2), size = 3)+
+  annotate("text", x= 22.2, y = 1.8, label = round(percrC$percent[9],2), size = 3)+
+  annotate("text", x= 3, y = 1.2, label = round(percrC$percent[5],2), size = 3)+
+  annotate("text", x= 3.5, y = .8, label = round(percrC$percent[10],2), size = 3)
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+perHiA <- read.csv("~/Research/Buriganga/monteData/simul/percent_HiA.csv")
+perHiC <- read.csv("/home/RHHLab/Research/Buriganga/monteData/simul/percent_HiC.csv")
+percrA <- read.csv("/home/RHHLab/Research/Buriganga/monteData/simul/percent_crA.csv")
+percrC <- read.csv("/home/RHHLab/Research/Buriganga/monteData/simul/percent_crC.csv")
+```
+
+```{r}
+perHiA
+```
+
+```{r}
+ggplot(data=perHiA,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Hg", "Cd", "As", "Zn", "Cu", "Ni", "Mn", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percent", y = "", title = "(a) Sensitivity HI Adult")+
+  theme(legend.position = "none")
+```
+
+```{r}
+ggplot(data=perHiC,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Hg", "Cd", "As", "Zn", "Cu", "Ni", "Mn", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percent", y = "", title = "(b) Sensitivity HI Child")
+```
+
+```{r}
+ggplot(data=percrA,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Cd", "As", "Ni", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percent", y = "", title = "(c) Sensitivity CR Adult")+
+  theme(legend.position = "none")
+```
+
+```{r}
+ggplot(data=percrC,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Cd", "As", "Ni", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percent", y = "", title = "(d) Sensitivity CR Child")
+```
+
+```{r}
+percrA
+```
+
+
+```{r}
+ggplot(data=perHiA,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Hg", "Cd", "As", "Zn", "Cu", "Ni", "Mn", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percent", y = "", title = "(a) Sensitivity HI Adult")+
+  theme(legend.position = "none")+
+  annotate("text", x= 11, y = 9.2, label = paste0(round(perHiA$percent[2],2), " %"), size = 3)+
+  annotate("text", x= 9.3, y = 8.77, label = paste0(round(perHiA$percent[11],2), " %"), size = 3)+
+  annotate("text", x= 6, y = 8.2, label = round(perHiA$percent[1],2), size = 3)+
+  annotate("text", x= 5.4, y = 7.7, label = round(perHiA$percent[10],2), size = 3)+
+  annotate("text", x= 4, y = 7.1, label = round(perHiA$percent[3],2), size = 3)+
+  annotate("text", x= 4, y = 6.7, label = round(perHiA$percent[12],2), size = 3)+
+  annotate("text", x= 4.2, y = 6.15, label = round(perHiA$percent[4],2), size = 3)+
+  annotate("text", x= 4.2, y = 5.8, label = round(perHiA$percent[13],2), size = 3)+
+  annotate("text", x= 3, y = 5.2, label = round(perHiA$percent[5],2), size = 3)+
+  annotate("text", x= 3, y = 4.8, label = round(perHiA$percent[14],2), size = 3)+
+  annotate("text", x= 15.5, y = 4.3, label = round(perHiA$percent[6],2), size = 3)+
+  annotate("text", x= 13.5, y = 3.75, label = round(perHiA$percent[15],2), size = 3)+
+  annotate("text", x= 55, y = 3.3, label = round(perHiA$percent[7],2), size = 3)+
+  annotate("text", x= 50, y = 2.8, label = round(perHiA$percent[16],2), size = 3)+
+  annotate("text", x= 20, y = 2.25, label = round(perHiA$percent[8],2), size = 3)+
+  annotate("text", x= 28.5, y = 1.8, label = round(perHiA$percent[17],2), size = 3)+
+  annotate("text", x= 12, y = 1.25, label = round(perHiA$percent[9],2), size = 3)+
+  annotate("text", x= 13, y = .7, label = round(perHiA$percent[18],2), size = 3)
+```
+
+```{r}
+ggplot(data=perHiA,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Hg", "Cd", "As", "Zn", "Cu", "Ni", "Mn", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percentage", y = "", title = "(a) Sensitivity HI Adult")+
+  theme(legend.position = "none")+
+  annotate("text", x= 11, y = 9.2, label = round(perHiA$percent[2],2), size = 3)+
+  annotate("text", x= 9.3, y = 8.77, label = round(perHiA$percent[11],2), size = 3)+
+  annotate("text", x= 6, y = 8.2, label = round(perHiA$percent[1],2), size = 3)+
+  annotate("text", x= 5.4, y = 7.7, label = round(perHiA$percent[10],2), size = 3)+
+  annotate("text", x= 4, y = 7.1, label = round(perHiA$percent[3],2), size = 3)+
+  annotate("text", x= 4, y = 6.7, label = round(perHiA$percent[12],2), size = 3)+
+  annotate("text", x= 4.2, y = 6.15, label = round(perHiA$percent[4],2), size = 3)+
+  annotate("text", x= 4.2, y = 5.8, label = round(perHiA$percent[13],2), size = 3)+
+  annotate("text", x= 3, y = 5.2, label = round(perHiA$percent[5],2), size = 3)+
+  annotate("text", x= 3, y = 4.8, label = round(perHiA$percent[14],2), size = 3)+
+  annotate("text", x= 15.5, y = 4.3, label = round(perHiA$percent[6],2), size = 3)+
+  annotate("text", x= 13.5, y = 3.75, label = round(perHiA$percent[15],2), size = 3)+
+  annotate("text", x= 55, y = 3.3, label = round(perHiA$percent[7],2), size = 3)+
+  annotate("text", x= 50, y = 2.8, label = round(perHiA$percent[16],2), size = 3)+
+  annotate("text", x= 20, y = 2.25, label = round(perHiA$percent[8],2), size = 3)+
+  annotate("text", x= 28.5, y = 1.8, label = round(perHiA$percent[17],2), size = 3)+
+  annotate("text", x= 12, y = 1.25, label = round(perHiA$percent[9],2), size = 3)+
+  annotate("text", x= 13, y = .7, label = round(perHiA$percent[18],2), size = 3)
+```
+
+```{r}
+ggplot(data=perHiC,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Hg", "Cd", "As", "Zn", "Cu", "Ni", "Mn", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percentage", y = "", title = "(b) Sensitivity HI Child")+
+  theme(legend.position = "none")+
+  annotate("text", x= 9, y = 9.2, label = round(perHiC$percent[2],2), size = 3)+
+  annotate("text", x= 8.5, y = 8.77, label = round(perHiC$percent[11],2), size = 3)+
+  annotate("text", x= 6, y = 8.2, label = round(perHiC$percent[1],2), size = 3)+
+  annotate("text", x= 5.4, y = 7.7, label = round(perHiC$percent[10],2), size = 3)+
+  annotate("text", x= 3.5, y = 7.1, label = round(perHiC$percent[3],2), size = 3)+
+  annotate("text", x= 3.5, y = 6.7, label = round(perHiC$percent[12],2), size = 3)+
+  annotate("text", x= 4.2, y = 6.15, label = round(perHiC$percent[4],2), size = 3)+
+  annotate("text", x= 4.2, y = 5.8, label = round(perHiC$percent[13],2), size = 3)+
+  annotate("text", x= 3, y = 5.2, label = round(perHiC$percent[5],2), size = 3)+
+  annotate("text", x= 3, y = 4.8, label = round(perHiC$percent[14],2), size = 3)+
+  annotate("text", x= 15, y = 4.3, label = round(perHiC$percent[6],2), size = 3)+
+  annotate("text", x= 12.5, y = 3.75, label = round(perHiC$percent[15],2), size = 3)+
+  annotate("text", x= 57, y = 3.3, label = round(perHiC$percent[7],2), size = 3)+
+  annotate("text", x= 52, y = 2.8, label = round(perHiC$percent[16],2), size = 3)+
+  annotate("text", x= 19, y = 2.25, label = round(perHiC$percent[8],2), size = 3)+
+  annotate("text", x= 27.5, y = 1.8, label = round(perHiC$percent[17],2), size = 3)+
+  annotate("text", x= 10.3, y = 1.25, label = round(perHiC$percent[9],2), size = 3)+
+  annotate("text", x= 12, y = .7, label = round(perHiC$percent[18],2), size = 3)
+```
+
+```{r}
+ggplot(data=percrA,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Cd", "As", "Ni", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percentage", y = "", title = "(c) Sensitivity CR Adult")+
+  theme(legend.position = "none")+
+  annotate("text", x= 23, y = 5.2, label = round(percrA$percent[1],2), size = 3)+
+  annotate("text", x= 23, y = 4.8, label = round(percrA$percent[6],2), size = 3)+
+  annotate("text", x= 56.5, y = 4.2, label = round(percrA$percent[2],2), size = 3)+
+  annotate("text", x= 55, y = 3.75, label = round(percrA$percent[7],2), size = 3)+
+  annotate("text", x= 13.5, y = 3.2, label = round(percrA$percent[3],2), size = 3)+
+  annotate("text", x= 13.7, y = 2.8, label = round(percrA$percent[8],2), size = 3)+
+  annotate("text", x= 20.2, y = 2.2, label = round(percrA$percent[4],2), size = 3)+
+  annotate("text", x= 22.2, y = 1.8, label = round(percrA$percent[9],2), size = 3)+
+  annotate("text", x= 3, y = 1.2, label = round(percrA$percent[5],2), size = 3)+
+  annotate("text", x= 3.5, y = .8, label = round(percrA$percent[10],2), size = 3)
+```
+
+```{r}
+ggplot(data=percrC,
+       aes(x=percent, y=metals,
+           fill=Seasons))+
+  geom_bar(stat="identity",
+           position="dodge")+
+  scale_y_discrete(limits = c("Pb", "Cd", "As", "Ni", "Cr"))+
+  removeGrid()+
+  theme_classic2()+
+  theme(axis.text.x = element_text(face = "bold", size = 15),
+      axis.text.y = element_text(face = "bold", size = 15),
+      text = element_text(size = 20, face = "bold"))+
+  xlim(0, 100)+
+  labs(x= "Percentage", y = "", title = "(d) Sensitivity CR Child")+
+  theme(legend.position = "none")+
+  annotate("text", x= 23, y = 5.2, label = round(percrC$percent[1],2), size = 3)+
+  annotate("text", x= 23, y = 4.8, label = round(percrC$percent[6],2), size = 3)+
+  annotate("text", x= 56.5, y = 4.2, label = round(percrC$percent[2],2), size = 3)+
+  annotate("text", x= 55, y = 3.75, label = round(percrC$percent[7],2), size = 3)+
+  annotate("text", x= 13.5, y = 3.2, label = round(percrC$percent[3],2), size = 3)+
+  annotate("text", x= 13.7, y = 2.8, label = round(percrC$percent[8],2), size = 3)+
+  annotate("text", x= 20.2, y = 2.2, label = round(percrC$percent[4],2), size = 3)+
+  annotate("text", x= 22.2, y = 1.8, label = round(percrC$percent[9],2), size = 3)+
+  annotate("text", x= 3, y = 1.2, label = round(percrC$percent[5],2), size = 3)+
+  annotate("text", x= 3.5, y = .8, label = round(percrC$percent[10],2), size = 3)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

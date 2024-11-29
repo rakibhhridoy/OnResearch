@@ -170,23 +170,221 @@ p
 
 
 ```{r}
+# Load necessary libraries
+library(ggplot2)
+library(ggpubr)
+
+# 1. Create the histogram (phist)
 phist <- gghistogram(
   log_normalRI, x = "RI", 
   add = "mean", rug = TRUE, bins = 100,
-  fill = "Legend", # Set histogram fill color
+  fill = "blue", # Set histogram fill color (replace "Legend" with a color like "blue")
   color = "black" # Set border color
 ) +
-#  xlim(NA, 100) +
+  #  xlim(NA, 100) +
   xlab(label = "Ecological Risk Index (RI)") +
   ylab("Frequency") +
   theme_minimal()  # Optional: Change theme for better visuals
 
-# 2. Create the density plot with y-axis on the right
+# 2. Create the density plot (pdensity) with y-axis on the right
 pdensity <- ggdensity(
   log_normalRI, x = "RI",
-  fill = "Legend", # Set density fill color
+  fill = "blue", # Set density fill color (same as histogram fill color)
   color = "black",  # Set density line color
   alpha = 0.5 # Set transparency level
+) +
+  #  xlim(NA, 100) +
+  ylab("Density") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right") +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis") +
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+# 3. Align the two plots and then overlay them
+aligned_plots <- align_plots(phist, pdensity, align = "hv", axis = "tblr")
+p <- ggdraw(aligned_plots[[1]]) + 
+     draw_plot(aligned_plots[[2]]) + 
+     draw_label("Log Normal Distribution", 
+                fontface = "bold", size = 12, x = 0.7, y = .97, vjust = 1)
+p
+```
+
+
+```{r}
+summary(simulated_data_n)
+```
+
+
+```{r}
+summary(simulated_data_l)
+```
+
+
+```{r}
+# Load necessary libraries
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+
+# Load your dataset
+data <- read.csv("../Python/RI.csv")
+
+# 2. Remove the 'RI' and 'Location' columns
+data_cleaned <- data %>%
+  select(-X,-RI_Winter, -RI_Rainy, -Location)  # Removing 'RI' and 'Location' columns
+
+# Check the cleaned data
+head(data_cleaned)
+
+```
+
+
+```{r}
+# 3. Separate the data into Rainy and Winter based on the suffix (W for Winter, R for Rainy)
+rainy_data <- data_cleaned %>%
+  select(contains("R"))  # Select only columns containing "R" (Rainy season)
+
+winter_data <- data_cleaned %>%
+  select(contains("W"))  # Select only columns containing "W" (Winter season)
+
+# Check the separate data frames
+head(rainy_data)
+head(winter_data)
+
+
+```
+
+
+```{r}
+# Function to generate log-normal data for a given dataset
+generate_normal_winter_data <- function(season_data, num_simulations) {
+  # Calculate mean and SD for each element
+  mean_Cd <- mean(season_data$CdW, na.rm = TRUE)
+  sd_Cd <- sd(season_data$CdW, na.rm = TRUE)
+  
+  mean_Cr <- mean(season_data$CrW, na.rm = TRUE)
+  sd_Cr <- sd(season_data$CrW, na.rm = TRUE)
+  
+  mean_Ni <- mean(season_data$NiW, na.rm = TRUE)
+  sd_Ni <- sd(season_data$NiW, na.rm = TRUE)
+  
+  mean_As <- mean(season_data$AsW, na.rm = TRUE)
+  sd_As <- sd(season_data$AsW, na.rm = TRUE)
+  
+  mean_Pb <- mean(season_data$PbW, na.rm = TRUE)
+  sd_Pb <- sd(season_data$PbW, na.rm = TRUE)
+  
+  mean_Cu <- mean(season_data$CuW, na.rm = TRUE)
+  sd_Cu <- sd(season_data$CuW, na.rm = TRUE)
+  
+  # Generate normal samples for each element
+  Cd_sim <- rnorm(num_simulations, mean = mean_Cd, sd = sd_Cd)
+  Cr_sim <- rnorm(num_simulations, mean = mean_Cr, sd = sd_Cr)
+  Ni_sim <- rnorm(num_simulations, mean = mean_Ni, sd = sd_Ni)
+  As_sim <- rnorm(num_simulations, mean = mean_As, sd = sd_As)
+  Pb_sim <- rnorm(num_simulations, mean = mean_Pb, sd = sd_Pb)
+  Cu_sim <- rnorm(num_simulations, mean = mean_Cu, sd = sd_Cu)
+  
+  # Calculate Risk Index (RI) as the sum of the elements
+  Risk_Index_sim <- Cd_sim + Cr_sim + Ni_sim + As_sim + Pb_sim + Cu_sim
+  
+  # Return the simulated data as a data frame
+  data.frame(
+    Cd = Cd_sim,
+    Cr = Cr_sim,
+    Ni = Ni_sim,
+    As = As_sim,
+    Pb = Pb_sim,
+    Cu = Cu_sim,
+    RI = Risk_Index_sim
+  )
+}
+
+generate_normal_rainy_data <- function(season_data, num_simulations) {
+  # Calculate mean and SD for each element
+  mean_Cd <- mean(season_data$CdR, na.rm = TRUE)
+  sd_Cd <- sd(season_data$CdR, na.rm = TRUE)
+  
+  mean_Cr <- mean(season_data$CrR, na.rm = TRUE)
+  sd_Cr <- sd(season_data$CrR, na.rm = TRUE)
+  
+  mean_Ni <- mean(season_data$NiR, na.rm = TRUE)
+  sd_Ni <- sd(season_data$NiR, na.rm = TRUE)
+  
+  mean_As <- mean(season_data$AsR, na.rm = TRUE)
+  sd_As <- sd(season_data$AsR, na.rm = TRUE)
+  
+  mean_Pb <- mean(season_data$PbR, na.rm = TRUE)
+  sd_Pb <- sd(season_data$PbR, na.rm = TRUE)
+  
+  mean_Cu <- mean(season_data$CuR, na.rm = TRUE)
+  sd_Cu <- sd(season_data$CuR, na.rm = TRUE)
+  
+  # Generate normal samples for each element
+  Cd_sim <- rnorm(num_simulations, mean = mean_Cd, sd = sd_Cd)
+  Cr_sim <- rnorm(num_simulations, mean = mean_Cr, sd = sd_Cr)
+  Ni_sim <- rnorm(num_simulations, mean = mean_Ni, sd = sd_Ni)
+  As_sim <- rnorm(num_simulations, mean = mean_As, sd = sd_As)
+  Pb_sim <- rnorm(num_simulations, mean = mean_Pb, sd = sd_Pb)
+  Cu_sim <- rnorm(num_simulations, mean = mean_Cu, sd = sd_Cu)
+  
+  # Calculate Risk Index (RI) as the sum of the elements
+  Risk_Index_sim <- Cd_sim + Cr_sim + Ni_sim + As_sim + Pb_sim + Cu_sim
+  
+  # Return the simulated data as a data frame
+  data.frame(
+    Cd = Cd_sim,
+    Cr = Cr_sim,
+    Ni = Ni_sim,
+    As = As_sim,
+    Pb = Pb_sim,
+    Cu = Cu_sim,
+    RI = Risk_Index_sim
+  )
+}
+
+# Perform Monte Carlo Simulation for Rainy and Winter seasons
+num_simulations <- 10000  # Set the number of simulations
+
+rainy_simulated_data <- generate_normal_winter_data(winter_data, num_simulations)
+winter_simulated_data <- generate_normal_rainy_data(rainy_data, num_simulations)
+
+# Add a new column indicating the season in each simulated data frame
+rainy_simulated_data$Season <- "Rainy"
+winter_simulated_data$Season <- "Winter"
+
+# Merge the two simulated data frames
+merged_simulated_data <- bind_rows(rainy_simulated_data, winter_simulated_data)
+
+# Check merged data
+head(merged_simulated_data)
+
+# 5. Plot combined Risk Index distribution for both seasons
+
+
+```
+
+
+```{r}
+phist <- gghistogram(
+  merged_simulated_data, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100,
+  fill = "Season", # Set histogram fill color
+  color = "black" # Set border color
+) +
+#  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)") +
+  ylab("Frequency") 
+
+# 2. Create the density plot with y-axis on the right
+pdensity <- ggdensity(
+  merged_simulated_data, x = "RI",
+  fill = "Season", # Set density fill color
+  color = "orange",  # Set density line color
+  alpha = 0.2 # Set transparency level
 ) +
 #  xlim(NA, 100) +
   ylab("Density") +
@@ -200,35 +398,18 @@ pdensity <- ggdensity(
 
 # 3. Align the two plots and then overlay them
 aligned_plots <- align_plots(phist, pdensity, align = "hv", axis = "tblr")
-ggdraw(aligned_plots[[1]]) + draw_plot(aligned_plots[[2]])
+
+p <- ggdraw(aligned_plots[[1]]) + 
+     draw_plot(aligned_plots[[2]]) + 
+     draw_label("Normal Distribution", 
+                fontface = "bold", size = 12, x = 0.75, y = .77, vjust = 1)
+p
+
 ```
 
 
 ```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
-```
-
-
-```{r}
+summary(merged_simulated_data)
 ```
 
 

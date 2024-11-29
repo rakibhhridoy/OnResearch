@@ -253,8 +253,6 @@ winter_data <- data_cleaned %>%
 # Check the separate data frames
 head(rainy_data)
 head(winter_data)
-
-
 ```
 
 
@@ -361,10 +359,6 @@ merged_simulated_data <- bind_rows(rainy_simulated_data, winter_simulated_data)
 
 # Check merged data
 head(merged_simulated_data)
-
-# 5. Plot combined Risk Index distribution for both seasons
-
-
 ```
 
 
@@ -409,19 +403,159 @@ p
 
 
 ```{r}
+write.csv(merged_simulated_data, "../data/mergedsimulated_normal.csv")
 summary(merged_simulated_data)
 ```
 
 
 ```{r}
+generate_lognormal_rainy_data <- function(season_data, num_simulations) {
+  # Calculate the mean and SD of the log-transformed data for each element in the Rainy season
+  mean_log_Cd <- mean(log(season_data$CdR), na.rm = TRUE)
+  sd_log_Cd <- sd(log(season_data$CdR), na.rm = TRUE)
+  
+  mean_log_Cr <- mean(log(season_data$CrR), na.rm = TRUE)
+  sd_log_Cr <- sd(log(season_data$CrR), na.rm = TRUE)
+  
+  mean_log_Ni <- mean(log(season_data$NiR), na.rm = TRUE)
+  sd_log_Ni <- sd(log(season_data$NiR), na.rm = TRUE)
+  
+  mean_log_As <- mean(log(season_data$AsR), na.rm = TRUE)
+  sd_log_As <- sd(log(season_data$AsR), na.rm = TRUE)
+  
+  mean_log_Pb <- mean(log(season_data$PbR), na.rm = TRUE)
+  sd_log_Pb <- sd(log(season_data$PbR), na.rm = TRUE)
+  
+  mean_log_Cu <- mean(log(season_data$CuR), na.rm = TRUE)
+  sd_log_Cu <- sd(log(season_data$CuR), na.rm = TRUE)
+  
+  # Generate lognormal samples for each element
+  Cd_sim <- rlnorm(num_simulations, meanlog = mean_log_Cd, sdlog = sd_log_Cd)
+  Cr_sim <- rlnorm(num_simulations, meanlog = mean_log_Cr, sdlog = sd_log_Cr)
+  Ni_sim <- rlnorm(num_simulations, meanlog = mean_log_Ni, sdlog = sd_log_Ni)
+  As_sim <- rlnorm(num_simulations, meanlog = mean_log_As, sdlog = sd_log_As)
+  Pb_sim <- rlnorm(num_simulations, meanlog = mean_log_Pb, sdlog = sd_log_Pb)
+  Cu_sim <- rlnorm(num_simulations, meanlog = mean_log_Cu, sdlog = sd_log_Cu)
+  
+  # Calculate Risk Index (RI) as the sum of the elements
+  Risk_Index_sim <- Cd_sim + Cr_sim + Ni_sim + As_sim + Pb_sim + Cu_sim
+  
+  # Return the simulated data as a data frame
+  data.frame(
+    Cd = Cd_sim,
+    Cr = Cr_sim,
+    Ni = Ni_sim,
+    As = As_sim,
+    Pb = Pb_sim,
+    Cu = Cu_sim,
+    RI = Risk_Index_sim
+  )
+}
+
+
+generate_lognormal_winter_data <- function(season_data, num_simulations) {
+  # Calculate the mean and SD of the log-transformed data for each element in the Winter season
+  mean_log_Cd <- mean(log(season_data$CdW), na.rm = TRUE)
+  sd_log_Cd <- sd(log(season_data$CdW), na.rm = TRUE)
+  
+  mean_log_Cr <- mean(log(season_data$CrW), na.rm = TRUE)
+  sd_log_Cr <- sd(log(season_data$CrW), na.rm = TRUE)
+  
+  mean_log_Ni <- mean(log(season_data$NiW), na.rm = TRUE)
+  sd_log_Ni <- sd(log(season_data$NiW), na.rm = TRUE)
+  
+  mean_log_As <- mean(log(season_data$AsW), na.rm = TRUE)
+  sd_log_As <- sd(log(season_data$AsW), na.rm = TRUE)
+  
+  mean_log_Pb <- mean(log(season_data$PbW), na.rm = TRUE)
+  sd_log_Pb <- sd(log(season_data$PbW), na.rm = TRUE)
+  
+  mean_log_Cu <- mean(log(season_data$CuW), na.rm = TRUE)
+  sd_log_Cu <- sd(log(season_data$CuW), na.rm = TRUE)
+  
+  # Generate lognormal samples for each element
+  Cd_sim <- rlnorm(num_simulations, meanlog = mean_log_Cd, sdlog = sd_log_Cd)
+  Cr_sim <- rlnorm(num_simulations, meanlog = mean_log_Cr, sdlog = sd_log_Cr)
+  Ni_sim <- rlnorm(num_simulations, meanlog = mean_log_Ni, sdlog = sd_log_Ni)
+  As_sim <- rlnorm(num_simulations, meanlog = mean_log_As, sdlog = sd_log_As)
+  Pb_sim <- rlnorm(num_simulations, meanlog = mean_log_Pb, sdlog = sd_log_Pb)
+  Cu_sim <- rlnorm(num_simulations, meanlog = mean_log_Cu, sdlog = sd_log_Cu)
+  
+  # Calculate Risk Index (RI) as the sum of the elements
+  Risk_Index_sim <- Cd_sim + Cr_sim + Ni_sim + As_sim + Pb_sim + Cu_sim
+  
+  # Return the simulated data as a data frame
+  data.frame(
+    Cd = Cd_sim,
+    Cr = Cr_sim,
+    Ni = Ni_sim,
+    As = As_sim,
+    Pb = Pb_sim,
+    Cu = Cu_sim,
+    RI = Risk_Index_sim
+  )
+}
+# Set the number of simulations
+num_simulations <- 10000  # Example: Set the number of simulations
+
+# Assuming you have `rainy_data` and `winter_data` as your original data for each season
+rainy_simulated_data <- generate_lognormal_rainy_data(rainy_data, num_simulations)
+winter_simulated_data <- generate_lognormal_winter_data(winter_data, num_simulations)
+
+# Add a new column indicating the season in each simulated data frame
+rainy_simulated_data$Season <- "Rainy"
+winter_simulated_data$Season <- "Winter"
+
+# Merge the two simulated data frames
+merged_simulated_data <- bind_rows(rainy_simulated_data, winter_simulated_data)
+
+# Check the first few rows of the merged data
+head(merged_simulated_data)
 ```
 
 
 ```{r}
+phist <- gghistogram(
+  merged_simulated_data, x = "RI", 
+  add = "mean", rug = TRUE, bins = 100,
+  fill = "Season", # Set histogram fill color
+  color = "black" # Set border color
+) +
+#  xlim(NA, 100) +
+  xlab(label = "Ecological Risk Index (RI)") +
+  ylab("Frequency") 
+
+# 2. Create the density plot with y-axis on the right
+pdensity <- ggdensity(
+  merged_simulated_data, x = "RI",
+  fill = "Season", # Set density fill color
+  color = "orange",  # Set density line color
+  alpha = 0.2 # Set transparency level
+) +
+#  xlim(NA, 100) +
+  ylab("Density") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.05)), position = "right") +
+  theme_half_open(11, rel_small = 1) +
+  rremove("x.axis") +
+  rremove("xlab") +
+  rremove("x.text") +
+  rremove("x.ticks") +
+  rremove("legend")
+
+# 3. Align the two plots and then overlay them
+aligned_plots <- align_plots(phist, pdensity, align = "hv", axis = "tblr")
+
+p <- ggdraw(aligned_plots[[1]]) + 
+     draw_plot(aligned_plots[[2]]) + 
+     draw_label("Log Normal Distribution", 
+                fontface = "bold", size = 12, x = 0.7, y = .77, vjust = 1)
+p
 ```
 
 
 ```{r}
+write.csv(merged_simulated_data, "../data/mergedsimulated_lognormal.csv")
+summary(merged_simulated_data)
 ```
 
 
